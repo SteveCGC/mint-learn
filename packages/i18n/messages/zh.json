@@ -1,0 +1,91 @@
+{
+  "common": {
+    "connect_wallet": "连接钱包",
+    "disconnect": "断开连接",
+    "sign_in": "签名登录",
+    "sign_out": "退出登录",
+    "loading": "加载中...",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "back": "返回",
+    "view_detail": "查看详情"
+  },
+  "nav": {
+    "home": "首页",
+    "courses": "课程广场",
+    "publish": "发布课程",
+    "profile": "个人中心",
+    "earnings": "收益中心"
+  },
+  "wallet": {
+    "connect_prompt": "请连接 MetaMask 钱包",
+    "install_metamask": "请先安装 MetaMask",
+    "wrong_network": "请切换到 Sepolia 测试网",
+    "switch_network": "切换网络",
+    "connecting": "连接中...",
+    "sign_prompt": "签名说明",
+    "sign_description": "此签名用于验证您的身份，不会产生任何 Gas 费用，也不会进行任何链上操作。",
+    "sign_confirm": "确认签名",
+    "session_expired": "登录已过期，请重新签名"
+  },
+  "course": {
+    "purchase": "立刻购买",
+    "purchased": "已购买",
+    "approve_first": "请先授权 MT 代币",
+    "approve_description": "购买课程前需要授权平台合约使用您的 MT 代币。",
+    "approve_confirm": "确认授权",
+    "purchase_success": "课程购买成功！",
+    "unlock_content": "查看课程内容",
+    "price": "价格",
+    "author": "作者",
+    "students": "学员人数",
+    "published_at": "发布时间"
+  },
+  "tx": {
+    "waiting_confirm": "等待 MetaMask 确认...",
+    "pending": "交易上链中，请稍候...",
+    "success": "交易成功！",
+    "failed": "交易失败",
+    "view_on_explorer": "在浏览器中查看",
+    "resend": "重新发送"
+  },
+  "profile": {
+    "my_courses": "已购课程",
+    "edit_nickname": "修改昵称",
+    "nickname_placeholder": "请输入昵称（1-30 字）",
+    "save_success": "保存成功"
+  },
+  "publish": {
+    "title": "发布课程",
+    "course_title": "课程标题",
+    "course_description": "课程简介",
+    "course_price": "课程价格（MT）",
+    "cover_image": "封面图片",
+    "content_file": "课程内容文件",
+    "submit": "发布上链",
+    "submitting": "发布中...",
+    "success": "课程发布成功！"
+  },
+  "aave": {
+    "title": "AAVE 理财",
+    "stake": "一键质押 AAVE",
+    "withdraw": "取回资产",
+    "current_balance": "当前质押余额",
+    "current_apy": "当前年化收益率",
+    "staking": "质押中...",
+    "stake_success": "质押成功！",
+    "withdraw_success": "取回成功！",
+    "asset_select": "选择资产",
+    "amount": "数量"
+  },
+  "errors": {
+    "insufficient_balance": "MT 余额不足，请先购买代币",
+    "insufficient_allowance": "授权额度不足，请重新授权",
+    "tx_failed": "交易失败：{reason}",
+    "network_mismatch": "请切换到 Sepolia 测试网",
+    "wallet_not_connected": "请先连接钱包",
+    "unknown": "发生未知错误，请重试",
+    "aave_failed": "AAVE 操作失败，资产已安全回滚"
+  }
+}

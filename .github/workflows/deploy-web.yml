@@ -1,0 +1,51 @@
+name: Deploy Web (Cloudflare Pages)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'packages/types/**'
+      - 'packages/i18n/**'
+
+jobs:
+  deploy:
+    name: Build & Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web
+        run: pnpm --filter web build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+          NEXT_PUBLIC_RPC_URL: ${{ secrets.RPC_URL }}
+          NEXT_PUBLIC_MT_TOKEN_ADDRESS: ${{ secrets.MT_TOKEN_ADDRESS }}
+          NEXT_PUBLIC_COURSE_MANAGER_ADDRESS: ${{ secrets.COURSE_MANAGER_ADDRESS }}
+          NEXT_PUBLIC_AAVE_V3_POOL_ADDRESS: ${{ secrets.AAVE_V3_POOL_ADDRESS }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: mintlearn-web
+          directory: apps/web/.vercel/output/static
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,91 @@
+{
+  "common": {
+    "connect_wallet": "Connect Wallet",
+    "disconnect": "Disconnect",
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out",
+    "loading": "Loading...",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "view_detail": "View Details"
+  },
+  "nav": {
+    "home": "Home",
+    "courses": "Courses",
+    "publish": "Publish",
+    "profile": "Profile",
+    "earnings": "Earnings"
+  },
+  "wallet": {
+    "connect_prompt": "Please connect your MetaMask wallet",
+    "install_metamask": "Please install MetaMask first",
+    "wrong_network": "Please switch to Sepolia Testnet",
+    "switch_network": "Switch Network",
+    "connecting": "Connecting...",
+    "sign_prompt": "Signature Required",
+    "sign_description": "This signature is used to verify your identity. It does not cost any gas and does not perform any on-chain operations.",
+    "sign_confirm": "Confirm Signature",
+    "session_expired": "Session expired. Please sign in again."
+  },
+  "course": {
+    "purchase": "Buy Now",
+    "purchased": "Purchased",
+    "approve_first": "Approve MT Token first",
+    "approve_description": "You need to approve the platform contract to spend your MT tokens before purchasing.",
+    "approve_confirm": "Confirm Approval",
+    "purchase_success": "Course purchased successfully!",
+    "unlock_content": "Access Course",
+    "price": "Price",
+    "author": "Author",
+    "students": "Students",
+    "published_at": "Published"
+  },
+  "tx": {
+    "waiting_confirm": "Waiting for MetaMask confirmation...",
+    "pending": "Transaction pending, please wait...",
+    "success": "Transaction successful!",
+    "failed": "Transaction failed",
+    "view_on_explorer": "View on Explorer",
+    "resend": "Resend"
+  },
+  "profile": {
+    "my_courses": "My Courses",
+    "edit_nickname": "Edit Nickname",
+    "nickname_placeholder": "Enter nickname (1-30 chars)",
+    "save_success": "Saved successfully"
+  },
+  "publish": {
+    "title": "Publish Course",
+    "course_title": "Course Title",
+    "course_description": "Course Description",
+    "course_price": "Price (MT)",
+    "cover_image": "Cover Image",
+    "content_file": "Course Content File",
+    "submit": "Publish On-Chain",
+    "submitting": "Publishing...",
+    "success": "Course published successfully!"
+  },
+  "aave": {
+    "title": "AAVE Finance",
+    "stake": "Stake to AAVE",
+    "withdraw": "Withdraw",
+    "current_balance": "Current Staked Balance",
+    "current_apy": "Current APY",
+    "staking": "Staking...",
+    "stake_success": "Staked successfully!",
+    "withdraw_success": "Withdrawn successfully!",
+    "asset_select": "Select Asset",
+    "amount": "Amount"
+  },
+  "errors": {
+    "insufficient_balance": "Insufficient MT balance. Please purchase more tokens.",
+    "insufficient_allowance": "Insufficient allowance. Please re-approve.",
+    "tx_failed": "Transaction failed: {reason}",
+    "network_mismatch": "Please switch to Sepolia Testnet",
+    "wallet_not_connected": "Please connect your wallet first",
+    "unknown": "An unknown error occurred. Please try again.",
+    "aave_failed": "AAVE operation failed. Your assets are safe."
+  }
+}

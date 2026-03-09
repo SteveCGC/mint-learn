@@ -1,0 +1,37 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# build outputs
+.next
+.vercel
+dist
+out
+
+# Cloudflare
+.wrangler
+.dev.vars
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode
+.idea
+*.swp
+
+# Hardhat
+artifacts
+cache
+typechain-types

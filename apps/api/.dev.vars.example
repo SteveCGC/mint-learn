@@ -1,0 +1,4 @@
+# Cloudflare Workers 本地开发环境变量（.dev.vars，不提交 git）
+JWT_SECRET=your-super-secret-jwt-key-min-32-chars
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:6543/postgres?pgbouncer=true&connection_limit=1
+DIRECT_DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres

@@ -1,0 +1,110 @@
+// MintLearn — Prisma Schema
+// Supabase PostgreSQL + PgBouncer 连接池适配
+
+generator client {
+  provider      = "prisma-client-js"
+  // Workers 环境适配：不打包 Query Engine 二进制，通过 Prisma Data Proxy 或 @prisma/adapter-pg 访问
+  // 生产部署时使用：prisma generate --no-engine
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  // PgBouncer 连接地址（Workers 使用）
+  url       = env("DATABASE_URL")
+  // 直连地址（仅 prisma migrate 时使用）
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// ─── 用户 ─────────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  address   String   @unique  // 钱包地址（小写）
+  nickname  String?
+  avatarUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authoredCourses Course[]         @relation("CourseAuthor")
+  purchases       PurchaseRecord[]
+  aavePositions   AavePosition[]
+  nonces          AuthNonce[]
+
+  @@map("users")
+}
+
+// ─── 登录 Nonce（防重放）────────────────────────────────────
+model AuthNonce {
+  id        String    @id @default(cuid())
+  address   String
+  nonce     String    @unique
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [address], references: [address], onDelete: Cascade)
+
+  @@index([address])
+  @@index([expiresAt])
+  @@map("auth_nonces")
+}
+
+// ─── 课程 ────────────────────────────────────────────────────
+model Course {
+  id            String   @id @default(cuid())
+  chainId       Int?     // 链上课程 ID（部署后填入）
+  authorAddress String
+  title         String
+  description   String?
+  price         BigInt   // MT 最小单位（避免精度丢失）
+  coverImageKey String?  // R2 Object Key
+  contentKey    String?  // R2 Object Key（付费内容）
+  metaHash      String   // 链上 metaHash
+  isActive      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author    User             @relation("CourseAuthor", fields: [authorAddress], references: [address])
+  purchases PurchaseRecord[]
+
+  @@index([authorAddress])
+  @@index([chainId])
+  @@index([isActive])
+  @@map("courses")
+}
+
+// ─── 购买记录 ────────────────────────────────────────────────
+model PurchaseRecord {
+  id          String   @id @default(cuid())
+  userAddress String
+  courseId    String
+  txHash      String   @unique  // 链上交易 hash
+  price       BigInt
+  purchasedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userAddress], references: [address])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userAddress, courseId])   // 防止重复购买记录
+  @@index([userAddress])
+  @@index([courseId])
+  @@map("purchase_records")
+}
+
+// ─── AAVE 质押记录 ───────────────────────────────────────────
+model AavePosition {
+  id          String   @id @default(cuid())
+  userAddress String
+  asset       String   // 资产合约地址（USDT/USDC）
+  amount      BigInt   // 操作金额（最小单位）
+  txHash      String   @unique
+  action      String   // "supply" | "withdraw"
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userAddress], references: [address])
+
+  @@index([userAddress])
+  @@map("aave_positions")
+}

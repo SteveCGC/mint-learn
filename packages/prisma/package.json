@@ -1,0 +1,19 @@
+{
+  "name": "prisma",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "generate": "prisma generate --no-engine",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "studio": "prisma studio",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.21.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.21.1",
+    "typescript": "^5"
+  }
+}

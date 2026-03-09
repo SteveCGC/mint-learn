@@ -1,0 +1,25 @@
+name = "mintlearn-api"
+main = "src/index.ts"
+compatibility_date = "2024-10-22"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare R2 绑定
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "mintlearn-courses"
+
+# 环境变量（非敏感）
+[vars]
+ENVIRONMENT = "development"
+
+# 敏感变量通过 wrangler secret put 配置：
+# wrangler secret put JWT_SECRET
+# wrangler secret put DATABASE_URL
+# wrangler secret put DIRECT_DATABASE_URL
+
+# 生产环境配置
+[env.production]
+name = "mintlearn-api-prod"
+
+[env.production.vars]
+ENVIRONMENT = "production"
