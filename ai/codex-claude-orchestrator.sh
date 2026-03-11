@@ -8,7 +8,7 @@ set -euo pipefail
 
 # ======================== 配置区 ========================
 PROJECT_DIR="${PROJECT_DIR:-.}"                    # 项目目录
-TASKS_FILE="${TASKS_FILE:-tasks.json}"             # 任务清单文件
+TASKS_FILE="${TASKS_FILE:-ai/tasks.json}"          # 任务清单文件（相对项目根目录）
 LOG_DIR="${LOG_DIR:-./review-logs}"                 # 审查日志目录
 MAX_RETRIES="${MAX_RETRIES:-3}"                     # 每个模块最大重试次数
 CODEX_MODEL="${CODEX_MODEL:-gpt-5.4-codex}"        # Codex 使用的模型
@@ -186,9 +186,23 @@ run_tests() {
     local task_name="$1"
     log_info "[$task_name] 运行自动化测试..."
 
-    # 根据项目类型选择测试命令
-    if [ -f "package.json" ]; then
-        npm test 2>&1 | tee "${LOG_DIR}/${task_name}_test.log"
+    # 根据任务名前缀和项目类型选择测试命令
+    # 合约任务（C- 前缀）使用 Hardhat
+    if [[ "$task_name" == C-* ]] && [ -f "packages/contracts/hardhat.config.ts" ]; then
+        log_info "[$task_name] 检测到合约任务，运行 Hardhat 测试..."
+        pnpm --filter contracts test 2>&1 | tee "${LOG_DIR}/${task_name}_test.log"
+    # 后端任务（B- 前缀）运行 API 类型检查
+    elif [[ "$task_name" == B-* ]] && [ -f "apps/api/package.json" ]; then
+        log_info "[$task_name] 检测到后端任务，运行 TypeScript 类型检查..."
+        pnpm --filter api typecheck 2>&1 | tee "${LOG_DIR}/${task_name}_test.log"
+    # 前端任务（F- 前缀）运行前端类型检查
+    elif [[ "$task_name" == F-* ]] && [ -f "apps/web/package.json" ]; then
+        log_info "[$task_name] 检测到前端任务，运行 TypeScript 类型检查..."
+        pnpm --filter web typecheck 2>&1 | tee "${LOG_DIR}/${task_name}_test.log"
+    # pnpm monorepo 根目录：运行全量测试
+    elif [ -f "pnpm-workspace.yaml" ]; then
+        log_info "[$task_name] 检测到 pnpm monorepo，运行全量类型检查..."
+        pnpm typecheck 2>&1 | tee "${LOG_DIR}/${task_name}_test.log"
     elif [ -f "pytest.ini" ] || [ -f "pyproject.toml" ]; then
         pytest 2>&1 | tee "${LOG_DIR}/${task_name}_test.log"
     elif [ -f "go.mod" ]; then

@@ -25,92 +25,102 @@
 ### 1. 安装 Codex CLI
 ```bash
 npm i -g @openai/codex
-# 或
-brew install --cask codex
 ```
 
 ### 2. 安装 Claude Code
 ```bash
-# 参考 https://code.claude.com 安装
+npm i -g @anthropic-ai/claude-code
 ```
 
 ### 3. 配置 API Keys
 ```bash
-# Codex 需要 OpenAI API Key
 export OPENAI_API_KEY="sk-..."
-
-# Claude Code 需要 Anthropic API Key
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
 ### 4. 安装依赖工具
 ```bash
-# jq 用于解析 JSON
 brew install jq   # macOS
 # apt install jq  # Linux
 ```
 
-## 快速开始
-
-### Step 1: 准备任务清单
-
-编辑 `tasks.json`，定义你的模块：
-
-```json
-{
-  "tasks": [
-    {
-      "name": "模块名称",
-      "coding_prompt": "给 Codex 的编码指令（越详细越好）",
-      "acceptance_criteria": "给 Claude Code 的验收标准"
-    }
-  ]
-}
+### 5. 安装项目依赖
+```bash
+pnpm install
 ```
 
-**关键技巧**：验收标准写得越具体，Claude Code 的审查就越严格有效。
+## 快速开始
+
+### Step 1: 确认任务清单
+
+本项目任务清单已按 DevPlan.md 配置好，位于 `ai/tasks.json`，包含以下模块：
+
+| 任务 ID | 描述 |
+|---------|------|
+| `C-01-mttoken-tests` | MTToken 合约单元测试 |
+| `C-02-coursemanager-tests` | CourseManager 合约单元测试 |
+| `B-01-auth-api` | 签名登录 API（SIWE + JWT）|
+| `B-02-courses-api` | 课程管理 API |
+| `B-03-r2-presigned-url` | R2 预签名 URL 服务 |
+| `F-01-wallet-components` | 钱包连接 + Navbar + TxProgress |
+| `F-02-auth-hook` | useAuth Hook + SignatureModal |
+| `F-03-course-list-detail` | 课程广场 + 详情页 |
+| `F-04-purchase-flow` | 购买流程（approve + purchaseCourse）|
+| `F-05-profile-learning` | 个人中心 + 课程学习页 |
+| `F-06-earnings-aave` | 收益中心 + AAVE 质押 |
 
 ### Step 2: 运行编排器
 
+从项目根目录运行：
+
 ```bash
-chmod +x codex-claude-orchestrator.sh
-./codex-claude-orchestrator.sh
+chmod +x ai/codex-claude-orchestrator.sh
+
+# 运行全部任务
+./ai/codex-claude-orchestrator.sh
+
+# 只运行指定模块（通过自定义 tasks.json 子集）
+TASKS_FILE=ai/tasks.json ./ai/codex-claude-orchestrator.sh
 ```
 
 ### Step 3: 查看结果
 
-审查日志保存在 `review-logs/` 目录：
-- `*_codex_output.txt` — Codex 的编码输出
-- `*_review_attempt*.json` — Claude Code 的验收报告
-- `*_fix_instructions.txt` — 修复指令（FAIL 时生成）
-- `*_test.log` — 测试运行日志
+审查日志保存在 `ai/review-logs/` 目录（不提交 git）：
+
+```
+ai/review-logs/
+├── C-01-mttoken-tests_codex_attempt1.log      # Codex 编码日志
+├── C-01-mttoken-tests_review_attempt1.json    # Claude Code 验收报告（JSON）
+├── C-01-mttoken-tests_test.log                # 测试运行日志
+└── C-01-mttoken-tests_fix_instructions.txt    # FAIL 时的修复指令
+```
 
 ## 配置选项
 
 通过环境变量自定义行为：
 
 ```bash
-PROJECT_DIR=./my-project \
-TASKS_FILE=./my-tasks.json \
-MAX_RETRIES=5 \
+PROJECT_DIR=./ \
+TASKS_FILE=ai/tasks.json \
+MAX_RETRIES=3 \
 CODEX_MODEL=gpt-5.4-codex \
 CLAUDE_MODEL=claude-opus-4-6 \
-./codex-claude-orchestrator.sh
+LOG_DIR=ai/review-logs \
+./ai/codex-claude-orchestrator.sh
 ```
 
-## 工作流细节
+## 测试命令说明
 
-### 每个模块的处理循环
+编排器根据任务名前缀自动选择测试命令：
 
-1. **Codex 编码** — 使用 `codex exec --full-auto` 执行编码任务
-2. **自动测试** — 检测项目类型，自动运行对应测试框架
-3. **Claude Code 验收** — 使用 `claude -p` headless 模式审查 git diff
-4. **结果判定**：
-   - `PASS` → 打 git tag，进入下一模块
-   - `FAIL` → 提取修复指令，交给 Codex 重试
-5. **重试上限** — 默认 3 轮，超过则标记模块失败
+| 任务前缀 | 测试命令 | 说明 |
+|---------|---------|------|
+| `C-` | `pnpm --filter contracts test` | Hardhat 合约测试 |
+| `B-` | `pnpm --filter api typecheck` | API TypeScript 类型检查 |
+| `F-` | `pnpm --filter web typecheck` | 前端 TypeScript 类型检查 |
+| 其他 | `pnpm typecheck` | 全量类型检查 |
 
-### Claude Code 验收的 8 项检查
+## Claude Code 验收的 8 项检查
 
 | 检查项 | 说明 |
 |--------|------|
@@ -123,33 +133,8 @@ CLAUDE_MODEL=claude-opus-4-6 \
 | 可维护性 | 代码结构和命名 |
 | 测试覆盖 | 测试是否充分 |
 
-## 进阶用法
+## 注意事项
 
-### 与 CI/CD 集成
-
-在 GitHub Actions 中使用：
-
-```yaml
-name: AI Code Review Pipeline
-on: [push]
-jobs:
-  codex-claude-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-      - name: Install tools
-        run: |
-          npm i -g @openai/codex
-          # install claude code
-      - name: Run orchestrator
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: ./codex-claude-orchestrator.sh
-```
-
-### 自定义验收标准
-
-你可以在 `tasks.json` 中为每个模块定制不同的验收侧重点。例如对安全敏感模块加重安全审查权重，对数据处理模块加重性能审查权重。
+- `ai/review-logs/` 目录已加入 `.gitignore`，本地生成不提交
+- 任务中涉及链上操作的（C- 任务）需确保本地 Hardhat 节点可用
+- B- 和 F- 任务建议先配置好 `.env.local` 和 `.dev.vars`，避免环境变量缺失导致 typecheck 失败
