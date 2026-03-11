@@ -8,8 +8,9 @@ set -euo pipefail
 
 # ======================== 配置区 ========================
 PROJECT_DIR="${PROJECT_DIR:-.}"                    # 项目目录
-TASKS_FILE="${TASKS_FILE:-ai/tasks.json}"          # 任务清单文件（相对项目根目录）
-LOG_DIR="${LOG_DIR:-./review-logs}"                 # 审查日志目录
+TASKS_FILE="${TASKS_FILE:-}"                       # 单文件模式：指定具体 JSON 文件
+TASKS_DIR="${TASKS_DIR:-}"                         # 目录模式：加载目录下所有 JSON 文件
+LOG_DIR="${LOG_DIR:-./review-logs}"                # 审查日志目录
 MAX_RETRIES="${MAX_RETRIES:-3}"                     # 每个模块最大重试次数
 CODEX_MODEL="${CODEX_MODEL:-gpt-5.4-codex}"        # Codex 使用的模型
 CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-4-6}"  # Claude Code 使用的模型
@@ -43,9 +44,29 @@ check_prerequisites() {
         exit 1
     fi
 
-    if [ ! -f "$TASKS_FILE" ]; then
+    # 至少需要指定 TASKS_FILE 或 TASKS_DIR 之一
+    if [ -z "$TASKS_FILE" ] && [ -z "$TASKS_DIR" ]; then
+        # 默认回退：优先 ai/tasks/ 目录，其次 ai/tasks.json
+        if [ -d "ai/tasks" ]; then
+            TASKS_DIR="ai/tasks"
+            log_info "自动检测到 ai/tasks/ 目录，进入目录模式"
+        elif [ -f "ai/tasks.json" ]; then
+            TASKS_FILE="ai/tasks.json"
+            log_info "自动检测到 ai/tasks.json，进入单文件模式"
+        else
+            log_fail "未找到任务文件或目录，请设置 TASKS_FILE 或 TASKS_DIR"
+            exit 1
+        fi
+    fi
+
+    if [ -n "$TASKS_FILE" ] && [ ! -f "$TASKS_FILE" ]; then
         log_fail "未找到任务文件: $TASKS_FILE"
         log_info "请先创建任务文件，格式参考 tasks.example.json"
+        exit 1
+    fi
+
+    if [ -n "$TASKS_DIR" ] && [ ! -d "$TASKS_DIR" ]; then
+        log_fail "未找到任务目录: $TASKS_DIR"
         exit 1
     fi
 
@@ -286,27 +307,51 @@ main() {
 
     cd "$PROJECT_DIR"
 
-    # 读取任务清单
-    local total_tasks
-    total_tasks=$(jq '.tasks | length' "$TASKS_FILE")
-    log_info "共 ${total_tasks} 个模块待处理"
-
     local passed=0
     local failed=0
     local failed_tasks=()
 
-    # 逐模块执行
-    for i in $(seq 0 $((total_tasks - 1))); do
-        local name=$(jq -r ".tasks[$i].name" "$TASKS_FILE")
-        local prompt=$(jq -r ".tasks[$i].coding_prompt" "$TASKS_FILE")
-        local requirements=$(jq -r ".tasks[$i].acceptance_criteria" "$TASKS_FILE")
+    # 收集所有需要处理的任务文件
+    local task_files=()
+    if [ -n "$TASKS_DIR" ]; then
+        while IFS= read -r -d '' f; do
+            task_files+=("$f")
+        done < <(find "$TASKS_DIR" -maxdepth 1 -name "*.json" -print0 | sort -z)
+        log_info "目录模式: 共 ${#task_files[@]} 个任务文件 → ${TASKS_DIR}/"
+    else
+        task_files=("$TASKS_FILE")
+        log_info "单文件模式: ${TASKS_FILE}"
+    fi
 
-        if process_task "$name" "$prompt" "$requirements"; then
-            ((passed++))
-        else
-            ((failed++))
-            failed_tasks+=("$name")
-        fi
+    # 统计总任务数
+    local total_tasks=0
+    for tf in "${task_files[@]}"; do
+        local cnt
+        cnt=$(jq '.tasks | length' "$tf")
+        total_tasks=$((total_tasks + cnt))
+    done
+    log_info "共 ${total_tasks} 个模块待处理"
+
+    # 逐文件、逐模块执行
+    for tf in "${task_files[@]}"; do
+        local file_task_count
+        file_task_count=$(jq '.tasks | length' "$tf")
+        local file_desc
+        file_desc=$(jq -r '.description // .project // ""' "$tf")
+        [ -n "$file_desc" ] && log_info ">>> 文件: $(basename "$tf") — ${file_desc}"
+
+        for i in $(seq 0 $((file_task_count - 1))); do
+            local name=$(jq -r ".tasks[$i].name" "$tf")
+            local prompt=$(jq -r ".tasks[$i].coding_prompt" "$tf")
+            local requirements=$(jq -r ".tasks[$i].acceptance_criteria" "$tf")
+
+            if process_task "$name" "$prompt" "$requirements"; then
+                ((passed++))
+            else
+                ((failed++))
+                failed_tasks+=("$name")
+            fi
+        done
     done
 
     # ======================== 最终报告 ========================

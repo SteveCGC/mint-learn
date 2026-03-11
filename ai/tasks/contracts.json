@@ -1,0 +1,16 @@
+{
+  "project": "mint-learn",
+  "description": "合约任务 — MTToken 和 CourseManager 单元测试",
+  "tasks": [
+    {
+      "name": "C-01-mttoken-tests",
+      "coding_prompt": "在 packages/contracts/test/MTToken.test.ts 中为 MTToken.sol 编写完整单元测试。\n\n合约位置: packages/contracts/contracts/MTToken.sol\n测试框架: Hardhat + ethers.js + Chai\n\n必须覆盖以下用例:\n1. 部署后 owner 持有全部初始供应量（1_000_000_000 * 10^18）\n2. owner 可以调用 mint(address, amount) 给任意地址增发\n3. 非 owner 调用 mint 应 revert（OwnableUnauthorizedAccount）\n4. 任意持有者可以调用 burn(amount) 销毁自己的代币\n5. burn 金额超过余额时应 revert\n6. ERC20 标准: transfer、transferFrom、approve、allowance 行为正确\n7. 转账到 address(0) 应 revert\n\n运行命令: cd packages/contracts && pnpm test",
+      "acceptance_criteria": "1. 所有测试用例均通过，无跳过\n2. 覆盖率 >= 85%（通过 pnpm coverage 验证）\n3. 使用 TypeScript 编写，有完整类型注解\n4. 测试描述清晰（describe/it 嵌套合理）\n5. 每个测试独立，不依赖其他测试的副作用\n6. 没有硬编码的私钥或助记词"
+    },
+    {
+      "name": "C-02-coursemanager-tests",
+      "coding_prompt": "在 packages/contracts/test/CourseManager.test.ts 中为 CourseManager.sol 编写完整单元测试。\n\n合约位置: packages/contracts/contracts/CourseManager.sol\n测试框架: Hardhat + ethers.js + Chai\n\n必须覆盖以下用例:\n1. createCourse: price=0 时 revert InvalidPrice\n2. createCourse: 成功创建，courseCount 递增，emit CourseCreated 事件\n3. createCourse: getAuthorCourses 返回正确数组\n4. updateCourse: 非作者调用 revert NotCourseAuthor\n5. updateCourse: 作者成功更新，emit CourseUpdated\n6. deactivateCourse: 非作者调用 revert，作者成功下架\n7. purchaseCourse: 买家 MT 余额不足（未 approve）时 revert\n8. purchaseCourse: 成功购买，MT 从买家转移到作者，emit CoursePurchased\n9. purchaseCourse: 重复购买同一课程 revert AlreadyPurchased\n10. purchaseCourse: 已下架课程 revert CourseNotActive\n11. purchaseCourse: 重入攻击场景（构造恶意合约）被 ReentrancyGuard 阻止\n12. checkPurchase / getUserPurchases / getAuthorCourses 查询结果正确\n\n运行命令: cd packages/contracts && pnpm test",
+      "acceptance_criteria": "1. 所有 12 个测试场景均有对应测试并通过\n2. 覆盖率 >= 85%，purchaseCourse 函数 100% 行覆盖\n3. 重入攻击测试必须包含真实的 ReentrancyAttacker 合约模拟\n4. 使用 loadFixture 避免重复部署（性能优化）\n5. 事件验证使用 emit().withArgs() 精确匹配参数\n6. 所有 revert 验证使用 revertedWithCustomError() 而非字符串匹配"
+    }
+  ]
+}

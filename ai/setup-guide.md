@@ -53,21 +53,29 @@ pnpm install
 
 ### Step 1: 确认任务清单
 
-本项目任务清单已按 DevPlan.md 配置好，位于 `ai/tasks.json`，包含以下模块：
+本项目任务清单已按 DevPlan.md 配置好，拆分为三个子文件，位于 `ai/tasks/` 目录：
 
-| 任务 ID | 描述 |
-|---------|------|
-| `C-01-mttoken-tests` | MTToken 合约单元测试 |
-| `C-02-coursemanager-tests` | CourseManager 合约单元测试 |
-| `B-01-auth-api` | 签名登录 API（SIWE + JWT）|
-| `B-02-courses-api` | 课程管理 API |
-| `B-03-r2-presigned-url` | R2 预签名 URL 服务 |
-| `F-01-wallet-components` | 钱包连接 + Navbar + TxProgress |
-| `F-02-auth-hook` | useAuth Hook + SignatureModal |
-| `F-03-course-list-detail` | 课程广场 + 详情页 |
-| `F-04-purchase-flow` | 购买流程（approve + purchaseCourse）|
-| `F-05-profile-learning` | 个人中心 + 课程学习页 |
-| `F-06-earnings-aave` | 收益中心 + AAVE 质押 |
+| 文件 | 包含任务 | 说明 |
+|------|----------|------|
+| `ai/tasks/contracts.json` | C-01, C-02 | Solidity 合约单元测试 |
+| `ai/tasks/backend.json` | B-01, B-02, B-03 | Hono API + R2 服务 |
+| `ai/tasks/frontend.json` | F-01 ~ F-06 | React 组件 + 页面 |
+
+各任务对应关系：
+
+| 任务 ID | 文件 | 描述 |
+|---------|------|------|
+| `C-01-mttoken-tests` | contracts.json | MTToken 合约单元测试 |
+| `C-02-coursemanager-tests` | contracts.json | CourseManager 合约单元测试 |
+| `B-01-auth-api` | backend.json | 签名登录 API（SIWE + JWT）|
+| `B-02-courses-api` | backend.json | 课程管理 API |
+| `B-03-r2-presigned-url` | backend.json | R2 预签名 URL 服务 |
+| `F-01-wallet-components` | frontend.json | 钱包连接 + Navbar + TxProgress |
+| `F-02-auth-hook` | frontend.json | useAuth Hook + SignatureModal |
+| `F-03-course-list-detail` | frontend.json | 课程广场 + 详情页 |
+| `F-04-purchase-flow` | frontend.json | 购买流程（approve + purchaseCourse）|
+| `F-05-profile-learning` | frontend.json | 个人中心 + 课程学习页 |
+| `F-06-earnings-aave` | frontend.json | 收益中心 + AAVE 质押 |
 
 ### Step 2: 运行编排器
 
@@ -76,11 +84,20 @@ pnpm install
 ```bash
 chmod +x ai/codex-claude-orchestrator.sh
 
-# 运行全部任务
+# 运行全部任务（自动加载 ai/tasks/ 目录下所有文件）
 ./ai/codex-claude-orchestrator.sh
 
-# 只运行指定模块（通过自定义 tasks.json 子集）
-TASKS_FILE=ai/tasks.json ./ai/codex-claude-orchestrator.sh
+# 只运行合约任务
+TASKS_FILE=ai/tasks/contracts.json ./ai/codex-claude-orchestrator.sh
+
+# 只运行后端任务
+TASKS_FILE=ai/tasks/backend.json ./ai/codex-claude-orchestrator.sh
+
+# 只运行前端任务
+TASKS_FILE=ai/tasks/frontend.json ./ai/codex-claude-orchestrator.sh
+
+# 指定自定义任务目录
+TASKS_DIR=ai/tasks ./ai/codex-claude-orchestrator.sh
 ```
 
 ### Step 3: 查看结果
@@ -101,13 +118,16 @@ ai/review-logs/
 
 ```bash
 PROJECT_DIR=./ \
-TASKS_FILE=ai/tasks.json \
+TASKS_DIR=ai/tasks \       # 目录模式（优先，加载目录下所有 JSON）
+TASKS_FILE=ai/tasks/backend.json \  # 单文件模式（指定单个文件时使用）
 MAX_RETRIES=3 \
 CODEX_MODEL=gpt-5.4-codex \
 CLAUDE_MODEL=claude-opus-4-6 \
 LOG_DIR=ai/review-logs \
 ./ai/codex-claude-orchestrator.sh
 ```
+
+> **优先级**: `TASKS_DIR` > `TASKS_FILE` > 自动检测（先找 `ai/tasks/` 目录，再找 `ai/tasks.json`）
 
 ## 测试命令说明
 

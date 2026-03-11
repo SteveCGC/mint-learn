@@ -1,0 +1,21 @@
+{
+  "project": "mint-learn",
+  "description": "后端任务 — SIWE 登录、课程 API、R2 预签名 URL",
+  "tasks": [
+    {
+      "name": "B-01-auth-api",
+      "coding_prompt": "实现 apps/api/src/routes/auth.ts 中签名登录 API，取消所有 TODO 注释，接入真实的 Prisma + Supabase 操作。\n\n技术栈:\n- Hono v4（路由框架）\n- Prisma Client（ORM，通过 packages/prisma/src/client.ts 初始化）\n- viem verifyMessage（签名验证，已在 apps/api/src/services/signature.ts 实现）\n- hono/jwt（JWT 签发）\n\n需要实现:\n1. GET /auth/nonce: 生成 UUID nonce，写入 Supabase auth_nonces 表（expiresAt = now + 5分钟），返回 { nonce, message }\n2. POST /auth/verify: \n   a. 从 auth_nonces 表查询 nonce，验证未过期且 usedAt 为 null\n   b. 调用 verifySignature(address, nonce, signature) 验证签名\n   c. 在事务中: UPSERT users 表 + 更新 nonce.usedAt = now\n   d. 签发 JWT（payload: sub=address, exp=24h, jti=uuid）\n   e. 通过 Set-Cookie 返回 HttpOnly JWT\n3. POST /auth/logout: 清除 Cookie\n\n错误处理:\n- nonce 不存在/已过期: 400 { error: 'Invalid or expired nonce' }\n- 签名验证失败: 401 { error: 'Invalid signature' }\n- 所有错误响应格式统一: { error: string }\n\nPrisma client 初始化方式参考 packages/prisma/src/client.ts，DATABASE_URL 从 c.env.DATABASE_URL 获取。",
+      "acceptance_criteria": "1. GET /auth/nonce 返回有效的 UUID nonce 和签名消息\n2. auth_nonces 表写入成功，expiresAt 为当前时间 +5 分钟\n3. POST /auth/verify 签名验证使用 viem verifyMessage，不使用 ethers.js\n4. nonce 验证后立即标记 usedAt，防止重放攻击\n5. users 表 UPSERT 正确（首次登录创建，再次登录不报错）\n6. JWT Cookie 设置 HttpOnly + Secure + SameSite=Strict + Max-Age=86400\n7. 重放 nonce（usedAt 已设置）时返回 400\n8. 所有数据库操作有 try/catch，错误有日志输出\n9. 无硬编码的 JWT 密钥，从 c.env.JWT_SECRET 读取"
+    },
+    {
+      "name": "B-02-courses-api",
+      "coding_prompt": "实现 apps/api/src/routes/courses.ts 中课程管理 API，接入 Prisma + Supabase。\n\n需要实现的接口:\n1. GET /courses: 分页查询 courses 表（isActive=true），支持 query params: page, pageSize, search（标题模糊匹配）, sort（createdAt_desc/price_asc/price_desc），返回 { total, page, pageSize, items: CourseListItem[] }\n2. GET /courses/:id: 查询单条课程，join 作者 nickname，返回 CourseDetail\n3. POST /courses（需 JWT）: 创建课程元数据，写入 Supabase courses 表，body 包含 { title, description, price（字符串 bigint）, metaHash, coverImageKey, contentKey }\n4. PUT /courses/:id（需 JWT）: 验证 authorAddress === JWT.sub，更新课程，支持修改 title/description/price/metaHash\n5. DELETE /courses/:id（需 JWT）: 验证作者身份，软删除（isActive=false）\n\n注意:\n- price 字段存储为 BigInt，API 返回时序列化为字符串\n- 所有 JWT 鉴权接口从 Cookie ml_session 读取 token\n- 使用 Zod 做请求体验证\n- 分页默认 page=1, pageSize=20，最大 pageSize=100\n\n类型参考 packages/types/src/course.ts",
+      "acceptance_criteria": "1. GET /courses 分页逻辑正确（skip/take），total 返回总数\n2. GET /courses 搜索功能使用 Prisma contains 而非 SQL 注入风险写法\n3. POST /courses price 字段: 接受字符串，存储为 BigInt，返回为字符串\n4. PUT /courses/:id 非作者操作返回 403\n5. DELETE /courses/:id 软删除，记录未物理删除\n6. 所有接口 Zod 验证失败返回 400 和具体字段错误信息\n7. BigInt 序列化时不报 JSON.stringify 错误（需自定义 replacer 或 toString）\n8. 查询使用索引字段（authorAddress, isActive, createdAt）"
+    },
+    {
+      "name": "B-03-r2-presigned-url",
+      "coding_prompt": "实现 apps/api/src/services/r2.ts 中真实的 R2 预签名 URL 生成，替换占位实现。\n\n使用 @aws-sdk/client-s3 和 @aws-sdk/s3-request-presigner 接入 Cloudflare R2（兼容 S3 API）。\n\n需要实现:\n1. createR2Client(env: Env): S3Client — 初始化 R2 S3 兼容客户端，endpoint 从 env 读取\n2. generateDownloadUrl(client, bucket, key, expiresIn=900): Promise<string> — 生成下载预签名 URL\n3. generateUploadUrl(client, bucket, key, contentType, expiresIn=3600): Promise<string> — 生成上传预签名 URL\n4. buildCourseContentKey(courseId, filename): string — 生成 R2 Object Key（格式: courses/{courseId}/{filename}）\n5. buildCourseCoverKey(courseId, filename): string — 封面图 Key（格式: covers/{courseId}/{filename}）\n\n更新 wrangler.toml，添加 R2_ACCOUNT_ID、R2_ACCESS_KEY_ID、R2_SECRET_ACCESS_KEY 环境变量说明（通过 wrangler secret 配置）。\n更新 apps/api/src/routes/content.ts，使用真实实现替换 TODO。",
+      "acceptance_criteria": "1. S3Client 使用 Cloudflare R2 endpoint（格式: https://{accountId}.r2.cloudflarestorage.com）\n2. 下载 URL 有效期默认 900 秒（15 分钟）\n3. 上传 URL 有效期默认 3600 秒，包含 ContentType 限制\n4. Object Key 格式符合规范，不含前导斜杠\n5. 函数有 TypeScript 类型注解\n6. 客户端初始化逻辑只依赖 env 变量，无硬编码凭证\n7. 错误（如 bucket 不存在）有明确的错误信息"
+    }
+  ]
+}
