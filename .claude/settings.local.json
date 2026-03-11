@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add .gitignore package.json pnpm-workspace.yaml tsconfig.base.json docs/ apps/ packages/ .github/)",
+      "Bash(git commit:*)",
+      "Bash(git add README.md)",
+      "Bash(git add README.md README.zh.md)",
+      "WebSearch",
+      "Bash(git add docs/Pages.md)"
+    ]
+  }
+}
