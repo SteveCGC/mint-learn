@@ -12,7 +12,7 @@ TASKS_FILE="${TASKS_FILE:-}"                       # 单文件模式：指定具
 TASKS_DIR="${TASKS_DIR:-}"                         # 目录模式：加载目录下所有 JSON 文件
 LOG_DIR="${LOG_DIR:-./review-logs}"                # 审查日志目录
 MAX_RETRIES="${MAX_RETRIES:-3}"                     # 每个模块最大重试次数
-CODEX_MODEL="${CODEX_MODEL:-gpt-5.4-codex}"        # Codex 使用的模型
+CODEX_MODEL="${CODEX_MODEL:-gpt-5.4}"              # Codex 使用的模型
 CLAUDE_MODEL="${CLAUDE_MODEL:-claude-opus-4-6}"  # Claude Code 使用的模型
 
 # 颜色输出
@@ -86,7 +86,7 @@ run_codex_coding() {
     codex exec \
         --full-auto \
         --model "$CODEX_MODEL" \
-        --output "${LOG_DIR}/${task_name}_codex_output.txt" \
+        --output-last-message "${LOG_DIR}/${task_name}_codex_output.txt" \
         "$task_prompt" \
         2>&1 | tee "$log_file"
 
