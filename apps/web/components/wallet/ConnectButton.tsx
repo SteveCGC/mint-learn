@@ -50,12 +50,12 @@ export function ConnectButton() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <Button variant="outline" disabled className="w-32" />;
-
   const metaMaskConnector = useMemo(
     () => connectors.find((connector) => connector.id === 'metaMask'),
     [connectors]
   );
+
+  if (!mounted) return <Button variant="outline" disabled className="w-32" />;
 
   const handleConnect = async () => {
     const ethereum = (window as Window & { ethereum?: { isMetaMask?: boolean } }).ethereum;
