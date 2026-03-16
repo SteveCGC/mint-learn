@@ -343,9 +343,11 @@ AAVE_V3_POOL_ADDRESS     AAVE V3 Pool on Sepolia
 ## Roadmap
 
 - [x] **Week 1** — Monorepo scaffold, CI/CD pipelines, Prisma schema, i18n setup
-- [ ] **Week 2** — Smart contract unit tests & Sepolia deployment, MetaMask integration
-- [ ] **Week 3–4** — Full course publish/purchase flow, SIWE login, R2 content delivery, profile page
-- [ ] **Week 5–6** — AAVE staking module, earnings dashboard, UI polish, edge case hardening
+- [x] **Week 2** — Smart contract unit tests (MTToken + CourseManager, reentrancy mock), MetaMask wallet integration, Network Guard, Navbar
+- [x] **Week 3** — SIWE login (Auth API + useAuth hook + SignatureModal), Course CRUD API, R2 presigned URL service, Course Square + Publish Course pages
+- [x] **Week 4** — PurchaseFlow state machine (5 states), TxProgress Sheet, Course Detail page, Profile page, Course learning page with presigned URL refresh
+- [x] **Week 5** — AAVE V3 StakePanel (approve→supply/withdraw), EarningsChart, Earnings Center page, full i18n coverage, local dev verification
+- [ ] **Week 6** — Contract deployment to Sepolia, Supabase production migrate, Cloudflare deploy, test coverage ≥ 85%, UI polish (Skeleton, responsive, Toast), end-to-end demo
 
 ---
 
