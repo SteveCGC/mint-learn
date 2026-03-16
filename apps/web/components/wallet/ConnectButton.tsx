@@ -2,7 +2,7 @@
 
 import { ChevronDown, ExternalLink, LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAccount, useConnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,6 +47,10 @@ export function ConnectButton() {
   const { connect, connectors, isPending } = useConnect();
   const { logout, isLoading } = useAuth();
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return <Button variant="outline" disabled className="w-32" />;
 
   const metaMaskConnector = useMemo(
     () => connectors.find((connector) => connector.id === 'metaMask'),
