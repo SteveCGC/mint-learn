@@ -75,11 +75,11 @@ export function ConnectButton() {
   if (!isConnected || !address) {
     return (
       <>
-        <Button disabled={isPending || isLoading} onClick={handleConnect} type="button">
-          {isPending || isLoading ? (
+        <Button disabled={isPending} onClick={handleConnect} type="button">
+          {isPending ? (
             <>
               <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-              {isPending ? tWallet('connecting') : tCommon('loading')}
+              {tWallet('connecting')}
             </>
           ) : (
             tCommon('connect_wallet')

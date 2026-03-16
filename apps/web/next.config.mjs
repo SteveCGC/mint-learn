@@ -12,6 +12,14 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    // MetaMask SDK has React Native peer deps not needed in browser
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@react-native-async-storage/async-storage': false,
+    };
+    return config;
+  },
 };
 
 export default withNextIntl(nextConfig);
