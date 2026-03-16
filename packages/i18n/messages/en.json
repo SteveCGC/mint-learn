@@ -33,6 +33,7 @@
     "wrong_network": "Please switch to Sepolia Testnet",
     "switch_network": "Switch Network",
     "connecting": "Connecting...",
+    "sign_in": "Sign In",
     "sign_prompt": "Signature Required",
     "sign_description": "This signature is used to verify your identity. It does not cost any gas and does not perform any on-chain operations.",
     "sign_confirm": "Confirm Signature",

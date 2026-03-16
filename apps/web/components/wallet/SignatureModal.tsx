@@ -29,7 +29,7 @@ export function SignatureModal({ open, onOpenChange }: SignatureModalProps) {
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent onClose={() => onOpenChange(false)}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{tWallet('sign_in')}</DialogTitle>
           <DialogDescription>{tWallet('sign_description')}</DialogDescription>

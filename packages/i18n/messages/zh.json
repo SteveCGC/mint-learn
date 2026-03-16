@@ -33,6 +33,7 @@
     "wrong_network": "请切换到 Sepolia 测试网",
     "switch_network": "切换网络",
     "connecting": "连接中...",
+    "sign_in": "签名登录",
     "sign_prompt": "签名说明",
     "sign_description": "此签名用于验证您的身份，不会产生任何 Gas 费用，也不会进行任何链上操作。",
     "sign_confirm": "确认签名",

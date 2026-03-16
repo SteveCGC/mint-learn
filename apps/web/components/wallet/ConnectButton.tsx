@@ -2,7 +2,7 @@
 
 import { ChevronDown, ExternalLink, LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAccount, useConnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,8 +15,10 @@ import {
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from '@/navigation';
@@ -45,11 +47,15 @@ export function ConnectButton() {
   const { connect, connectors, isPending } = useConnect();
   const { logout, isLoading } = useAuth();
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const metaMaskConnector = useMemo(
     () => connectors.find((connector) => connector.id === 'metaMask'),
     [connectors]
   );
+
+  if (!mounted) return <Button variant="outline" disabled className="w-32" />;
 
   const handleConnect = async () => {
     const ethereum = (window as Window & { ethereum?: { isMetaMask?: boolean } }).ethereum;
@@ -69,11 +75,11 @@ export function ConnectButton() {
   if (!isConnected || !address) {
     return (
       <>
-        <Button disabled={isPending || isLoading} onClick={handleConnect} type="button">
-          {isPending || isLoading ? (
+        <Button disabled={isPending} onClick={handleConnect} type="button">
+          {isPending ? (
             <>
               <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-              {isPending ? tWallet('connecting') : tCommon('loading')}
+              {tWallet('connecting')}
             </>
           ) : (
             tCommon('connect_wallet')
@@ -81,7 +87,7 @@ export function ConnectButton() {
         </Button>
 
         <Dialog onOpenChange={setInstallDialogOpen} open={installDialogOpen}>
-          <DialogContent onClose={() => setInstallDialogOpen(false)}>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>{tWallet('install_metamask_title')}</DialogTitle>
               <DialogDescription>
@@ -113,23 +119,15 @@ export function ConnectButton() {
   }
 
   return (
-    <DropdownMenu
-      trigger={({ open, toggle }) => (
-        <Button
-          aria-expanded={open}
-          aria-haspopup="menu"
-          className="gap-2"
-          onClick={toggle}
-          type="button"
-          variant="outline"
-        >
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button className="gap-2" type="button" variant="outline">
           <span>{formatAddress(address)}</span>
           <SepoliaBadge />
           <ChevronDown className="h-4 w-4" />
         </Button>
-      )}
-    >
-      <div aria-label={tWallet('account_menu')} className="py-1">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => router.push('/profile')}>
           {tNav('profile')}
         </DropdownMenuItem>
@@ -140,7 +138,7 @@ export function ConnectButton() {
         <DropdownMenuItem className="text-destructive" onClick={() => void logout()}>
           {tCommon('disconnect')}
         </DropdownMenuItem>
-      </div>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 }
