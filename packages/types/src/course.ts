@@ -17,6 +17,10 @@ export interface Course {
   updatedAt: Date;
 }
 
+export interface CourseDetail extends Course {
+  purchaseCount: number;
+}
+
 // 课程列表项（精简字段）
 export interface CourseListItem {
   id: string;

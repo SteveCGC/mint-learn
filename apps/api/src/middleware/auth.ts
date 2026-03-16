@@ -13,7 +13,7 @@ export const authMiddleware = createMiddleware<{ Bindings: Env }>(
     }
 
     try {
-      const payload = await verify(token, c.env.JWT_SECRET);
+      const payload = await verify(token, c.env.JWT_SECRET, 'HS256');
       c.set('jwtPayload', payload);
       await next();
     } catch {

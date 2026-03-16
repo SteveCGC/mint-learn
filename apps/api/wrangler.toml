@@ -11,11 +11,18 @@ bucket_name = "mintlearn-courses"
 # 环境变量（非敏感）
 [vars]
 ENVIRONMENT = "development"
+R2_ENDPOINT = "https://<your-account-id>.r2.cloudflarestorage.com"
+R2_BUCKET_NAME = "mintlearn-courses"
 
 # 敏感变量通过 wrangler secret put 配置：
 # wrangler secret put JWT_SECRET
 # wrangler secret put DATABASE_URL
 # wrangler secret put DIRECT_DATABASE_URL
+# Cloudflare Dashboard -> R2 -> Manage R2 API Tokens 中创建 S3 兼容凭证
+# R2 endpoint 中的 <your-account-id> 与这里保持一致
+# wrangler secret put R2_ACCOUNT_ID
+# wrangler secret put R2_ACCESS_KEY_ID
+# wrangler secret put R2_SECRET_ACCESS_KEY
 
 # 生产环境配置
 [env.production]
@@ -23,3 +30,13 @@ name = "mintlearn-api-prod"
 
 [env.production.vars]
 ENVIRONMENT = "production"
+R2_ENDPOINT = "https://<your-account-id>.r2.cloudflarestorage.com"
+R2_BUCKET_NAME = "mintlearn-courses"
+
+# 生产环境同样需要配置以下 secrets：
+# wrangler secret put JWT_SECRET --env production
+# wrangler secret put DATABASE_URL --env production
+# wrangler secret put DIRECT_DATABASE_URL --env production
+# wrangler secret put R2_ACCOUNT_ID --env production
+# wrangler secret put R2_ACCESS_KEY_ID --env production
+# wrangler secret put R2_SECRET_ACCESS_KEY --env production
