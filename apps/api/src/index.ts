@@ -14,8 +14,13 @@ export type Env = {
   // Workers Secrets
   JWT_SECRET: string;
   DATABASE_URL: string;
+  R2_ACCOUNT_ID: string;
+  R2_ACCESS_KEY_ID: string;
+  R2_SECRET_ACCESS_KEY: string;
   // Vars
   ENVIRONMENT: string;
+  R2_ENDPOINT: string;
+  R2_BUCKET_NAME: string;
 };
 
 const app = new Hono<{ Bindings: Env }>();

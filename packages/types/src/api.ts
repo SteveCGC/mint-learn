@@ -61,5 +61,5 @@ export interface AavePositionRecord {
   amount: string;
   txHash: string;
   action: 'supply' | 'withdraw';
-  createdAt: Date;
+  createdAt: string;
 }

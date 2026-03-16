@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
+import { zValidator } from '../lib/z-validator';
 import type { Env } from '../index';
 
 const aave = new Hono<{ Bindings: Env }>();
