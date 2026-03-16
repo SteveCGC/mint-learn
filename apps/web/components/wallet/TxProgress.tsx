@@ -40,7 +40,7 @@ export function TxProgress({ status, txHash, error, onRetry, title, description 
 
   return (
     <Sheet onOpenChange={() => {}} open={Boolean(status)}>
-      <SheetContent onClose={() => {}} side="bottom">
+      <SheetContent side="bottom">
         <SheetHeader>
           <div className="mb-4 flex items-center gap-3">
             {status === 'pending_confirm' ? (

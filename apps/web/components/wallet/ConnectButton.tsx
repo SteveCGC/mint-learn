@@ -15,8 +15,10 @@ import {
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from '@/navigation';
@@ -81,7 +83,7 @@ export function ConnectButton() {
         </Button>
 
         <Dialog onOpenChange={setInstallDialogOpen} open={installDialogOpen}>
-          <DialogContent onClose={() => setInstallDialogOpen(false)}>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>{tWallet('install_metamask_title')}</DialogTitle>
               <DialogDescription>
@@ -113,23 +115,15 @@ export function ConnectButton() {
   }
 
   return (
-    <DropdownMenu
-      trigger={({ open, toggle }) => (
-        <Button
-          aria-expanded={open}
-          aria-haspopup="menu"
-          className="gap-2"
-          onClick={toggle}
-          type="button"
-          variant="outline"
-        >
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button className="gap-2" type="button" variant="outline">
           <span>{formatAddress(address)}</span>
           <SepoliaBadge />
           <ChevronDown className="h-4 w-4" />
         </Button>
-      )}
-    >
-      <div aria-label={tWallet('account_menu')} className="py-1">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => router.push('/profile')}>
           {tNav('profile')}
         </DropdownMenuItem>
@@ -140,7 +134,7 @@ export function ConnectButton() {
         <DropdownMenuItem className="text-destructive" onClick={() => void logout()}>
           {tCommon('disconnect')}
         </DropdownMenuItem>
-      </div>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 }

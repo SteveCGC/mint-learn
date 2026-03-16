@@ -77,7 +77,7 @@ export function Navbar() {
       </div>
 
       <Sheet onOpenChange={setMobileOpen} open={mobileOpen}>
-        <SheetContent onClose={() => setMobileOpen(false)} side="right">
+        <SheetContent side="right">
           <SheetHeader>
             <SheetTitle>{tNav('menu')}</SheetTitle>
           </SheetHeader>
