@@ -330,9 +330,11 @@ GitHub Secrets 需配置：
 ## 开发路线图
 
 - [x] **Week 1** — Monorepo 骨架、CI/CD 流水线、Prisma Schema、国际化配置
-- [ ] **Week 2** — 合约开发与 Sepolia 部署，MetaMask 钱包连接，前端合约交互基础
-- [ ] **Week 3-4** — 课程发布/购买完整流程，签名登录，R2 内容上传与安全访问，个人中心
-- [ ] **Week 5-6** — AAVE 质押模块，收益可视化，UI 全面优化，边界异常测试
+- [x] **Week 2** — 智能合约单元测试（MTToken + CourseManager，含重入攻击模拟）、MetaMask 钱包集成、NetworkGuard、Navbar
+- [x] **Week 3** — SIWE 签名登录（Auth API + useAuth Hook + SignatureModal）、课程 CRUD API、R2 预签名 URL 服务、课程广场 + 发布课程页
+- [x] **Week 4** — PurchaseFlow 5 状态机、TxProgress Sheet、课程详情页、个人中心页、带预签名 URL 刷新的课程学习页
+- [x] **Week 5** — AAVE V3 StakePanel（approve→supply/withdraw）、EarningsChart 收益趋势图、收益中心页、i18n 全量覆盖、本地开发验证通过
+- [ ] **Week 6** — 合约部署到 Sepolia、Supabase 生产 migrate、Cloudflare 部署、测试覆盖率 ≥ 85%、UI 打磨（Skeleton/响应式/Toast）、端到端演示
 
 ---
 
