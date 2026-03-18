@@ -1,3 +1,6 @@
+# Claude Code agent worktrees (temporary, auto-generated)
+.claude/worktrees/
+
 # dependencies
 node_modules
 .pnpm-store
